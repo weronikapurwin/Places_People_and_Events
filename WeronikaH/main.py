@@ -53,51 +53,45 @@ for i in range(0, 10):  # zeby ograniczyc czas wykonywania liczy tylko czesc
     # dodanie danych z jednego listu
     for k in range(0, len(data)):
         if data_type[k] == 'PERSON':
-            query_osoba = 'CREATE (:Osoba {nazwa:"' + str(data[k]) + '",nrlistu:"' + str(i+1) + '"})'
-            session.run(query_osoba)
+            query_person = 'CREATE (:Person {name:"' + str(data[k]) + '",letter_num:"' + str(i+1) + '"})'
+            session.run(query_person)
         elif data_type[k] == 'DATE':
             #uzyc .split do rozdzielenia roku
-            query_data = 'CREATE (:Data {nazwa:"' + str(data[k]) + '",nrlistu:"' + str(i+1) + '"})'
-            session.run(query_data)
+            query_date = 'CREATE (:Date {date:"' + str(data[k]) + '",letter_num:"' + str(i+1) + '"})'
+            session.run(query_date)
 
     #dodanie listu
-    query_list = "CREATE (:List {nrlistu:'" + str(i+1) + "',tresc:'" + str(string) + "'})"
-    session.run(query_list)
+    query_letter = "CREATE (:Letter {letter_num:'" + str(i+1) + "',contents:'" + str(string) + "'})"
+    session.run(query_letter)
 
 
 #print(all_data_dataType)
 
-# utworzenie krawedzi miedzy osobami i datami
-# query_lists = "MATCH (o:Osoba), (d:Data) " \
-#                 "WHERE o.nrlistu = d.nrlistu " \
-#                 "CREATE (o)-[k:W_LISCIE]->(d) " \
-#                 "RETURN o,k,d;"
-
 # utworzenie krawedzi miedzy listami i osobami
-query_per_list = "MATCH (o:Osoba), (l:List) " \
-                "WHERE o.nrlistu = l.nrlistu " \
-                "CREATE (o)-[k:W_LISCIE]->(l) " \
-                "RETURN o,k,l;"
+query_per_let = "MATCH (p:Person), (l:Letter) " \
+                "WHERE p.letter_num = l.letter_num " \
+                "CREATE (p)-[k:MENTIONED_IN]->(l) " \
+                "RETURN p,k,l;"
 
-session.run(query_per_list)
+session.run(query_per_let)
 
 # utworzenie krawedzi miedzy listami i datami
-query_data_list = "MATCH (d:Data), (l:List) " \
-                "WHERE d.nrlistu = l.nrlistu " \
-                "CREATE (l)-[h:CZAS]->(d) " \
+query_date_let = "MATCH (d:Date), (l:Letter) " \
+                "WHERE d.letter_num = l.letter_num " \
+                "CREATE (d)-[h:MENTIONED_IN]->(l) " \
                 "RETURN d,h,l;"
 
-session.run(query_data_list)
+session.run(query_date_let)
 
 
 # zapytanie o wyszukanie takiej samej daty i zwrocenie numerow listow w ktorej jest
-query1 = "MATCH (l:List)-[r:CZAS]->(d:Data) WHERE d.nazwa = 'Saturday' RETURN l.nrlistu;"
+query1 = "MATCH (d:Date)-[h:MENTIONED_IN]->(l:Letter) WHERE d.date = 'Saturday' RETURN l.letter_num;"
 dane1 = session.run(query1).data()
 print(dane1)
 
 
 # zapytanie o wyszukanie takiej samej osoby i zwrocenie numerow listow w ktorej jest
-query2 = "MATCH (o:Osoba)-[f:W_LISCIE]->(l:List) WHERE o.nazwa = 'Dziewanowska' RETURN l.nrlistu"
+query2 = "MATCH (p:Person)-[f:MENTIONED_IN]->(l:Letter) WHERE p.name = 'Dziewanowska' RETURN l.letter_num"
 dane2 = session.run(query2).data()
 print(dane2)
 
