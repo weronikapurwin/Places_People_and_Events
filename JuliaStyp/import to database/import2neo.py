@@ -103,30 +103,3 @@ if __name__ == "__main__":
     neo.add_letters(data=letters)
     neo.add_xml_info(data=xml_info)
     neo.close()
-
-"""
-PROBLEMY
-- różne zapisy:
-    Feliks Mendelssohn-Bartholdy
-    Felix Mendelssohn-Bartholdy
-        Ernest Legouvé
-        Ernest Legouvė
-    Marie d Agoult (hrabina)
-    Marie d’Agoult
-    
-- uzupełnienia?:
-    Adèle Hugo
-    Adèle Hugo (Madame Hugo)
-        Anna Czartoryska
-        Anna Czartoryska (księżna)
-    
-- miejsca:
-    Dresden
-    Drezno
-        Edinburgh
-        Edynburg
-    Leipzig
-    Lipsk
-        Valdemosa koło Palmy
-        Valldemosa
-"""
