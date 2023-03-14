@@ -97,7 +97,7 @@ if __name__ == "__main__":
     # letters[['id', 'name', 'osoba_od', 'osoba_do', 'person_do', 'miejsce_do','place_do']].to_csv('title.csv')
 
     neo = Neo4jDB()
-    neo.clear()
+    # neo.clear()
     neo.add_persons(data=unique_persons())
     neo.add_places(data=unique_places())
     neo.add_letters(data=letters)
