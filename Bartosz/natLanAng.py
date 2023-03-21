@@ -14,7 +14,6 @@ for i in range(0, 10): # zeby ograniczyc czas wykonywania liczy tylko czesc
     # print("################")    
     string = lines[i]
     # print(string)
-    nlp = spacy.load("en_core_web_lg")
     doc = nlp(string)
     # print([(X.text, X.label_) for X in doc.ents])
 
