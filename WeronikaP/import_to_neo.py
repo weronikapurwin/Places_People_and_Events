@@ -26,7 +26,6 @@ class Neo4jDB:
         for country in data:
             tx.run("MERGE (c:Country {name: $name, geometry: $geo})",
                name=country['NAME'], geo=country['geometry'])
-            # self._match_years(tx, year=country['year'])
     
     @query
     def add_years(self, tx, year):
@@ -37,8 +36,8 @@ class Neo4jDB:
     @query
     def add_geometry(self, tx, data):
         for geo in data:
-            tx.run("MERGE (g:Geometry {name: $name, year: $year})",
-               name=geo['geometry'], year=geo['year'])
+            tx.run("MERGE (g:Geometry {name: $name, type: $type, format: $wkt, year: $year})",
+               name=geo['geometry'], type=geo['type'], wkt = 'WKT', year=geo['year'])
             self._match_geometry(tx, geo['geometry'], geo['NAME'])
     
     @query

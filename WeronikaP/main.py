@@ -11,6 +11,8 @@ if __name__=="__main__":
 
     '''connection to neo'''
     neo = Neo4jDB()
+    
+    '''clearing Database'''
     neo.clear()
 
     '''adding countries'''
@@ -32,17 +34,19 @@ if __name__=="__main__":
     '''transforming dataframe to list in order to import to neo4j'''
     countries = countries.to_dict('records')
     neo.add_countries(data= countries)
-    '''end of adding coutries'''
+    '''end of adding countries'''
 
     '''adding nodes with countries from different years and creating relations between corresponding countries and years'''
     for f, y in zip(files, years):
         '''reading data from shp files'''
         df = gpd.read_file(f)
-        '''adding columns with years (easier creting relathionships)'''
+        '''adding columns with years (easier creating relathionships)'''
         df['year'] = y
-
-        '''transforming geometry to wkt'''
+        
+        '''transforming geometry to wkt and adding columns with geometry type'''
         df = gpd.GeoDataFrame(df)
+        geom_types = [x.geom_type for x in df.geometry]
+        df['type'] = geom_types
         df = df.to_wkt()
 
         df = df.to_dict('records')
@@ -50,9 +54,10 @@ if __name__=="__main__":
         '''adding geometry nodes and relathionships between corresponding country and geometry (HAS_GEOMETRY)'''
         neo.add_geometry(data=df)
 
-        '''adding year nodes and relathionships bwtween geometry and year (IN_YEAR)'''
+        '''adding year nodes and relathionships between geometry and year (IN_YEAR)'''
         neo.add_years(year=y)
 
     '''removing attributes from nodes that will no longer be useful'''
-    neo.delete_attributes()     
+    neo.delete_attributes() 
+    '''closing connection to neo'''    
     neo.close()
