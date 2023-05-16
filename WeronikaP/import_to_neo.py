@@ -1,6 +1,5 @@
 from neo4j import GraphDatabase
 
-
 def query(method):
     def wrapper(*args, **kwargs):
         self = args[0]

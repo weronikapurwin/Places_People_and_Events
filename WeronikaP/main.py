@@ -54,7 +54,7 @@ if __name__=="__main__":
         
         '''transforming geometry to wkt and adding columns with geometry type'''
         df = gpd.GeoDataFrame(df)
-        #
+
         '''checking which country contains which city'''
         city_match = gpd.sjoin(cities, df, how="left", op="within")
 
@@ -87,5 +87,4 @@ if __name__=="__main__":
     '''closing connection to neo'''    
     neo.close()
 
-    #dodać rok do geometri miasta
 
