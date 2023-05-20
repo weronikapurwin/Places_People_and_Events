@@ -9,20 +9,20 @@ if __name__=="__main__":
     '''tables with data'''
     files = ['WeronikaP\\dane\\year_1783\\cntry1783.shp', 'WeronikaP\\dane\\year_1815\\cntry1815.shp', 'WeronikaP\\dane\\year_1880\\cntry1880.shp', 'WeronikaP\\dane\\year_1914\\cntry1914.shp','WeronikaP\\dane\\year_1920\\cntry1920.shp', 'WeronikaP\\dane\\year_1938\\cntry1938.shp']
     years = [1783, 1815, 1880, 1914, 1920, 1938]
-    city_path = 'WeronikaP\\dane\\places_coordinates.csv'
+    place_path = 'WeronikaP\\dane\\places_coordinates.csv'
 
     '''connection to neo'''
     neo = Neo4jDB()
     
     '''clearing Database - uncomment if you need'''
-    #neo.clear() 
+    # neo.clear() 
 
-    cities = pd.read_csv(city_path)
-    cities = gpd.GeoDataFrame(cities)
-    cities.geometry = gpd.points_from_xy(cities['x'], cities['y'])
-    cities_neo = cities.to_wkt()
-    cities_neo = cities_neo.to_dict('records')
-    neo.add_cities(data=cities_neo)
+    places = pd.read_csv(place_path)
+    places = gpd.GeoDataFrame(places)
+    places.geometry = gpd.points_from_xy(places['x'], places['y'])
+    places_neo = places.to_wkt()
+    places_neo = places_neo.to_dict('records')
+    neo.add_places(data=places_neo)
 
     '''adding countries'''
     temp = []
@@ -55,8 +55,8 @@ if __name__=="__main__":
         '''transforming geometry to wkt and adding columns with geometry type'''
         df = gpd.GeoDataFrame(df)
 
-        '''checking which country contains which city'''
-        city_match = gpd.sjoin(cities, df, how="left", op="within")
+        '''checking which country contains which place'''
+        place_match = gpd.sjoin(places, df, how="left", op="within")
 
         '''adding columns named type with geometry types'''
         geom_types_country = [x.geom_type for x in df.geometry]
@@ -71,16 +71,16 @@ if __name__=="__main__":
         '''adding year nodes and relathionships between geometry and year (IN_YEAR)'''
         neo.add_years(year=y)
 
-        city_match.dropna(subset=['NAME'], inplace=True)
-        neo.match_city_with_country(city=city_match['name'], country=city_match['NAME'], year=y)
+        place_match.dropna(subset=['NAME'], inplace=True)
+        neo.match_place_with_country(place=place_match['name'], country=place_match['NAME'], year=y)
 
-        '''adding geometry to cities'''
-        geom_types_city = [x.geom_type for x in city_match.geometry]
-        city_match['type'] = geom_types_city
-        city_match = city_match.to_wkt()
-        city_match = city_match.to_dict('records')
+        '''adding geometry to places'''
+        geom_types_place = [x.geom_type for x in place_match.geometry]
+        place_match['type'] = geom_types_place
+        place_match = place_match.to_wkt()
+        place_match = place_match.to_dict('records')
 
-        neo.add_geometry_cities(data=city_match)
+        neo.add_geometry_places(data=place_match)
 
     '''removing attributes from nodes that will no longer be useful'''
     neo.delete_attributes() 

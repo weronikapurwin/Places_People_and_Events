@@ -27,10 +27,10 @@ class Neo4jDB:
                name=country['NAME'], geo=country['geometry'])
     
     @query
-    def add_cities(self, tx, data):
-        for city in data:
-            tx.run("""MERGE (c:City {name: $name, geometry: $geo})""",
-               name=city['name'], geo=city['geometry'])
+    def add_places(self, tx, data):
+        for place in data:
+            tx.run("""MERGE (c:Place {name: $name, geometry: $geo})""",
+               name=place['name'], geo=place['geometry'])
             
     @query
     def add_years(self, tx, year):
@@ -46,29 +46,29 @@ class Neo4jDB:
             self._match_geometry_countries_years(tx, geo['geometry'], geo['NAME'])
     
     @query
-    def add_geometry_cities(self, tx, data):
+    def add_geometry_places(self, tx, data):
         for geo in data:
             tx.run("""MERGE (g:Geometry {name: $name, type: $type, format: $wkt})""",
                name=geo['geometry'], type=geo['type'], wkt='WKT')
-            self._match_geometry_cities(tx, geo=geo['geometry'], city=geo['name'])
+            self._match_geometry_places(tx, geo=geo['geometry'], place=geo['name'])
     
     @query
     def delete_attributes(self, tx):
         tx.run("""MATCH (c:Country) REMOVE c.geometry""")
         tx.run("""MATCH (g:Geometry) REMOVE g.year""")
-        tx.run("""MATCH (c:City) REMOVE c.geometry""")
+        tx.run("""MATCH (c:Place) REMOVE c.geometry""")
     
     @query
-    def match_city_with_country(self, tx, city, country, year):
-        for c1, c2 in zip (city, country):
-            tx.run("""MATCH (city:City {name: $c1}), (country:Country {name: $c2})
-            MERGE (city)-[:IS_IN {year: $year}]->(country)""", 
+    def match_place_with_country(self, tx, place, country, year):
+        for c1, c2 in zip (place, country):
+            tx.run("""MATCH (place:Place {name: $c1}), (country:Country {name: $c2})
+            MERGE (place)-[:IS_IN {year: $year}]->(country)""", 
             c1=c1, c2=c2, year=year)
     
     @staticmethod
-    def _match_geometry_cities(tx, geo, city):
-        return tx.run(f"""MATCH (city:City), (geo:Geometry) WHERE geo.name = "{geo}" and city.name = "{city}"
-                          MERGE (city)-[:HAS_GEOMETRY]->(geo)""")
+    def _match_geometry_places(tx, geo, place):
+        return tx.run(f"""MATCH (place:Place), (geo:Geometry) WHERE geo.name = "{geo}" and place.name = "{place}"
+                          MERGE (place)-[:HAS_GEOMETRY]->(geo)""")
 
     @staticmethod
     def _match_geometry_countries_years(tx, geo, country):
